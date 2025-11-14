@@ -1,0 +1,63 @@
+.article-style h1 {
+  font-size: 40px;
+  margin-bottom: 24px;
+  font-weight: bold;
+}
+
+.article-style h2 {
+  font-size: 32px;
+  margin-bottom: 32px;
+  font-weight: 700;
+}
+
+.article-style h3 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.article-style p,
+.article-style li {
+  font-size: 18px;
+}
+
+.article-style p {
+  margin-bottom: 8px;
+}
+
+.article-style ol {
+  list-style: decimal;
+}
+
+.article-style ul {
+  list-style: disc;
+}
+
+.article-style li {
+  margin-bottom: 4px;
+}
+
+.article-style blockquote {
+  font-size: 16px;
+  font-style: italic;
+}
+
+.article-style hr{
+    border-top: 2px gainsboro solid;
+}
+
+.article-style a{
+    text-decoration: underline;
+    color: rgb(60, 111, 187);
+}
+
+.article-style pre{
+  display: block;
+  background-color: rgb(29, 27, 27);
+  border-radius: 5px;
+  padding: 5px 20px;
+}
+
+.article-style code {
+  font-size: 18px;
+}
