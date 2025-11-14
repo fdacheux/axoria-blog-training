@@ -2,7 +2,7 @@ import { connectToDB } from "@/lib/serverActions/session";
 import { Tag } from "@/lib/models/tag";
 
 export async function getTags() {
-  await connectToDB;
+  await connectToDB();
 
   const tags = await Tag.aggregate([
     {
