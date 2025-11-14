@@ -2,7 +2,7 @@ import { getPostForEdit } from "@/lib/serverMethods/blog/postMethods";
 import ClientEditForm from "./components/ClientEditForm";
 import { Types } from "mongoose";
 
-export default async function page({ params }) {
+export default async function Page({ params }) {
   const { id } = await params;
   const post = await getPostForEdit(id);
   const serializablePost = JSON.parse(

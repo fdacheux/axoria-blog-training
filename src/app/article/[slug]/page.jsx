@@ -4,7 +4,7 @@ import Image from "next/image";
 import "./article-styles.css";
 import "prism-themes/themes/prism-vsc-dark-plus.css";
 
-export default async function page({ params }) {
+export default async function Page({ params }) {
   const { slug } = await params;
   const post = await getPost(slug);
   return (

@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const revalidate = 60
 
-export default async function page() {
+export default async function Page() {
   const tags = await getTags();
 
   return (

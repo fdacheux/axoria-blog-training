@@ -3,7 +3,7 @@ import { getPostsByAuthor } from "@/lib/serverMethods/blog/postMethods";
 
 export const revalidate = 60
 
-export default async function page({ params }) {
+export default async function Page({ params }) {
   const { author} = await params;
   const postsData = await getPostsByAuthor(author);
 
