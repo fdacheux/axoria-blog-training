@@ -1,15 +1,20 @@
 "use client";
 
-import { useRef } from "react";
+import { useActionState, useRef, useState } from "react";
 import { login } from "@/lib/serverActions/session/sessionServerActions";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/AuthContext";
 
+const initialState = {
+  message: "",
+};
+
 export default function Signin() {
-  const {setIsAuthenticated} = useAuth()
+  const { setIsAuthenticated } = useAuth();
   const serverInfoRef = useRef();
   const submitButtonRef = useRef();
   const router = useRouter();
+  const [error, setError] = useState(null);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -20,19 +25,34 @@ export default function Signin() {
 
     try {
       const result = await login(new FormData(e.target));
-      if (result.success) {
-        setIsAuthenticated({loading: false, isConnected: true, userId :result.userId })
+
+      if (!result.message && result.success) {
+        setIsAuthenticated({
+          loading: false,
+          isConnected: true,
+          userId: result.userId,
+        });
         router.push("/");
       } else {
-        serverInfoRef.current.textContent = `An error has occurred : `;
-        console.error("Error during login : ", result.error);
+        console.error(`An error has occurred : ${result.message}`);
+
+        serverInfoRef.current.classList.remove("hidden");
+        submitButtonRef.current.disabled = false;
+        submitButtonRef.current.textContent = "Submit";
+        serverInfoRef.current.textContent = `An error has occurred : ${result.message}`;
+        serverInfoRef.current.classList;
       }
     } catch (err) {
       serverInfoRef.current.classList.remove("hidden");
+      submitButtonRef.current.disabled = false;
+      submitButtonRef.current.textContent = "Submit";
+
+      setError(err);
       console.error("Error during login : ", err);
       submitButtonRef.current.disabled = false;
       submitButtonRef.current.textContent = "Submit";
-      serverInfoRef.current.textContent = `${err.message}`;
+      serverInfoRef.current.textContent = `Error while loging in`;
+
       serverInfoRef.current.classList;
     }
   }

@@ -4,7 +4,7 @@ import DeletePostBtn from "./components/DeletePostBtn";
 export default async function Page({ params }) {
   const { userId } = await params;
   const posts = await getUserPostsFromUserID(userId);
-  
+
   return (
     <main className="u-main-container u-padding-content-container">
       <h1 className="text-3xl mb-5">Dashboard - Your articles</h1>
@@ -27,11 +27,11 @@ export default async function Page({ params }) {
               >
                 Edit
               </Link>
-              <DeletePostBtn id={post._id.toString()}/>
+              <DeletePostBtn id={post._id.toString()} />
             </li>
           ))
         ) : (
-          <li>You haven&apost created any articles yet.</li>
+          <li>You have not created any articles yet.</li>
         )}
       </ul>
     </main>

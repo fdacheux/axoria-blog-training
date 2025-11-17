@@ -83,23 +83,19 @@ export async function register(formData) {
 
 export async function login(formData) {
   const { userName, password } = Object.fromEntries(formData);
-  const invalidCredentialsMsg = "Invalid credentials";
+  
   try {
     await connectToDB();
-  }catch(err){
-    console.error("Error while signing in : ", err.message);
-
-    throw new Error(err.message);
-  }
 
     const user = await User.findOne({ userName: userName });
     if (!user) {
-      return { message: invalidCredentialsMsg };
+      throw new Error("Invalid credentials");
+      
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return { message: invalidCredentialsMsg };
+      throw new Error("Invalid credentials");
     }
 
     let session;
@@ -118,12 +114,7 @@ export async function login(formData) {
       });
       await session.save();
     }
-    if (!session) {
-      return {
-        message:
-          "Failed to log in, if problem persists please contact support.",
-      };
-    }
+
     const cookieStore = await cookies();
     cookieStore.set("sessionId", session._id.toString(), {
       httpOnly: true,
@@ -135,7 +126,11 @@ export async function login(formData) {
     revalidateTag("auth-session");
 
     return { success: true, userId: user._id.toString() };
-  
+  } catch (err) {
+    console.error("Error while signing in : ", err.message);
+   
+    throw new Error(err.message);
+  }
 }
 
 export async function logOut() {
