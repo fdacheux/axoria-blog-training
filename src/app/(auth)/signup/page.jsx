@@ -21,7 +21,7 @@ export default function Signup() {
     try {
       const result = await register(new FormData(e.target));
 
-      if (result.success) {
+      if (!result.message && result.success) {
         submitButtonRef.current.textContent = "User created ✅";
         let countdown = 3;
         serverInfoRef.current.textContent = `Redirecting in ${countdown}...`;
@@ -34,6 +34,13 @@ export default function Signup() {
             router.push(`/signin`);
           }
         }, 1000);
+      } else {
+        console.log(result.message);
+
+        serverInfoRef.current.classList.remove("hidden");
+        serverInfoRef.current.textContent = `${result.message}`;
+        submitButtonRef.current.textContent = "Submit";
+        submitButtonRef.current.disabled = false;
       }
     } catch (err) {
       serverInfoRef.current.classList.remove("hidden");
@@ -68,13 +75,13 @@ export default function Signup() {
         required
       />
       <label htmlFor="password" className="f-label">
-        Password 
+        Password
       </label>
       <small className="italic block mb-2 text-slate-500">
         Password must be between 8-64 chars, contain at least one uppercase
         character, one digit and one special character
       </small>
-      
+
       <input
         type="password"
         name="password"

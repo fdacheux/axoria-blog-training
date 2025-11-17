@@ -74,7 +74,7 @@ export async function register(formData) {
   } catch (err) {
     console.error("Error while registering :", err);
     if (err instanceof AppError) {
-      throw err;
+      return {message: err.message}
     }
 
     throw new Error("An error occured while registering.");
