@@ -11,6 +11,7 @@ export default function Page() {
   const submitButtonRef = useRef(null);
   const serverValidationText = useRef(null);
   const imgUploadValidationText = useRef(null);
+
   function handleFileChange(e) {
     const file = e.target.files[0];
     const validImageTypes = [
@@ -61,7 +62,7 @@ export default function Page() {
     try {
       const result = await addPost(formData);
 
-      if (result.success) {
+      if (!result.message && result.success) {
         submitButtonRef.current.textContent = "Post saved ✅";
         let countdown = 3;
         serverValidationText.current.textContent = `Redirecting in ${countdown}...`;
@@ -74,6 +75,10 @@ export default function Page() {
             router.push(`/article/${result.slug}`);
           }
         }, 1000);
+      } else {
+        serverValidationText.current.textContent = `${result.message}`;
+        submitButtonRef.current.textContent = "Submit";
+        submitButtonRef.current.disabled = false;
       }
     } catch (err) {
       serverValidationText.current.textContent = `${err.message}`;
@@ -114,6 +119,7 @@ export default function Page() {
           name="title"
           id="title"
           placeholder="Title"
+          minLength={3}
           className="shadow border rounded w-full p-3 mb-7 text-gray-700 focus:outline-slate-400"
           required
         />
@@ -193,7 +199,7 @@ export default function Page() {
         >
           Submit
         </button>
-        <p ref={serverValidationText}></p>
+        <p className="text-red-600 italic" ref={serverValidationText}></p>
       </form>
     </main>
   );

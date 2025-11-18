@@ -81,7 +81,6 @@ export async function addPost(formData) {
 
     const publicImageUrl = `https://pull-one-axoria-blog-test.b-cdn.net/${uniqueFileName}`;
 
-
     const response = await fetch(uploadUrl, {
       method: "PUT",
       headers: {
@@ -90,7 +89,6 @@ export async function addPost(formData) {
       },
       body: imageBuffer,
     });
-
 
     if (!response.ok) {
       throw new AppError(
@@ -160,11 +158,11 @@ export async function addPost(formData) {
   } catch (err) {
     console.error("Error while creating the post :", err);
     if (err instanceof AppError) {
-      throw err;
+      return { message: err.message };
     }
 
     console.error(err);
-    throw new Error("An error occured while creating the post");
+    return {message: "An error occured while creating the post"};
   }
 }
 
