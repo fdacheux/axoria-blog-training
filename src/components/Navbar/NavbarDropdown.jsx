@@ -8,11 +8,13 @@ import {
   isPrivatePage,
 } from "@/lib/serverActions/session/sessionServerActions";
 import { useAuth } from "@/app/AuthContext";
+import Toast from "../Toast";
 
 export default function NavbarDropdown({ userId }) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const [error, setError] = useState(null);
 
   const { setIsAuthenticated } = useAuth();
 
@@ -22,12 +24,17 @@ export default function NavbarDropdown({ userId }) {
 
   async function handleLogout() {
     const result = await logOut();
-    if (result.success) {
+    if (!result.message && result.success) {
       setIsAuthenticated({ loading: false, isConnected: false, userId: null });
 
       if (await isPrivatePage(window.location.pathname)) {
         router.push("/signin");
       }
+    }
+    else{
+      setError(result.message)
+      console.error(result.message)
+      toggleDropdown()
     }
   }
 
@@ -71,6 +78,7 @@ export default function NavbarDropdown({ userId }) {
           </li>
         </ul>
       )}
+      {(error && <Toast errMsg={error} />)}
     </div>
   );
 }

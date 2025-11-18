@@ -74,7 +74,7 @@ export async function register(formData) {
   } catch (err) {
     console.error("Error while registering :", err);
     if (err instanceof AppError) {
-      return {message: err.message}
+      return { message: err.message };
     }
 
     throw new Error("An error occured while registering.");
@@ -86,56 +86,54 @@ export async function login(formData) {
   const invalidCredentialsMsg = "Invalid credentials";
   try {
     await connectToDB();
-  }catch(err){
+  } catch (err) {
     console.error("Error while signing in : ", err.message);
 
     throw new Error(err.message);
   }
 
-    const user = await User.findOne({ userName: userName });
-    if (!user) {
-      return { message: invalidCredentialsMsg };
-    }
+  const user = await User.findOne({ userName: userName });
+  if (!user) {
+    return { message: invalidCredentialsMsg };
+  }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return { message: invalidCredentialsMsg };
-    }
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    return { message: invalidCredentialsMsg };
+  }
 
-    let session;
-    const existingSession = await Session.findOne({
+  let session;
+  const existingSession = await Session.findOne({
+    userId: user._id,
+    expiresAt: { $gt: new Date() }, //$gt = greater than
+  });
+  if (existingSession) {
+    session = existingSession;
+    existingSession.expiresAt = newDate(Date.now() + 7 * 24 * 60 * 60 * 1000); //faire un utils ?
+    await existingSession.save();
+  } else {
+    session = new Session({
       userId: user._id,
-      expiresAt: { $gt: new Date() }, //$gt = greater than
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
-    if (existingSession) {
-      session = existingSession;
-      existingSession.expiresAt = newDate(Date.now() + 7 * 24 * 60 * 60 * 1000); //faire un utils ?
-      await existingSession.save();
-    } else {
-      session = new Session({
-        userId: user._id,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      });
-      await session.save();
-    }
-    if (!session) {
-      return {
-        message:
-          "Failed to log in, if problem persists please contact support.",
-      };
-    }
-    const cookieStore = await cookies();
-    cookieStore.set("sessionId", session._id.toString(), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 7 * 24 * 60 * 60,
-      sameSite: "Lax", // CSRF
-    });
-    revalidateTag("auth-session");
+    await session.save();
+  }
+  if (!session) {
+    return {
+      message: "Failed to log in, if problem persists please contact support.",
+    };
+  }
+  const cookieStore = await cookies();
+  cookieStore.set("sessionId", session._id.toString(), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60,
+    sameSite: "Lax", // CSRF
+  });
+  revalidateTag("auth-session");
 
-    return { success: true, userId: user._id.toString() };
-  
+  return { success: true, userId: user._id.toString() };
 }
 
 export async function logOut() {
@@ -156,6 +154,10 @@ export async function logOut() {
     return { success: true };
   } catch (err) {
     console.log(err);
+    return {
+      message:
+        "Error while loging out, please retry later. If problem persists, contact support.",
+    };
   }
 }
 
