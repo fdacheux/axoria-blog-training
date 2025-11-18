@@ -109,7 +109,7 @@ export async function login(formData) {
   });
   if (existingSession) {
     session = existingSession;
-    existingSession.expiresAt = newDate(Date.now() + 7 * 24 * 60 * 60 * 1000); //faire un utils ?
+    existingSession.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); //faire un utils ?
     await existingSession.save();
   } else {
     session = new Session({
