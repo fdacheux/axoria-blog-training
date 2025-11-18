@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 export default function Toast({ errMsg }) {
   const [isDisplayed, setIsDisplayed] = useState(true);
   const toastRef = useRef(null);
+  const errorTxt = errMsg ? errMsg : "";
 
   function closeToast() {
     setIsDisplayed(false);
@@ -44,19 +45,19 @@ export default function Toast({ errMsg }) {
         />
       </svg>
 
-      <div class="ms-2.5 text-sm border-s border-default ps-3.5">
-        <p className="text-white font-semibold">{errMsg}</p>
+      <div className="ms-2.5 text-sm border-s border-default ps-3.5">
+        <p className="text-white font-semibold">{errorTxt}</p>
       </div>
       <button
         type="button"
-        class="ms-auto flex items-center justify-center text-body hover:text-heading bg-transparent box-border border border-transparent hover:bg-neutral-secondary-medium focus:ring-4 focus:ring-neutral-tertiary font-medium leading-5 rounded text-sm h-8 w-8 focus:outline-none"
+        className="ms-auto flex items-center justify-center text-body hover:text-heading bg-transparent box-border border border-transparent hover:bg-neutral-secondary-medium focus:ring-4 focus:ring-neutral-tertiary font-medium leading-5 rounded text-sm h-8 w-8 focus:outline-none"
         data-dismiss-target="#toast-default"
         aria-label="Close"
         onClick={closeToast}
       >
-        <span class="sr-only">Close</span>
+        <span className="sr-only">Close</span>
         <svg
-          class="w-5 h-5"
+          className="w-5 h-5"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -66,9 +67,9 @@ export default function Toast({ errMsg }) {
         >
           <path
             stroke="#fff"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="4"
             d="M6 18 17.94 6M18 18 6.06 6"
           />
         </svg>

@@ -322,7 +322,7 @@ export async function deletePost(id) {
   } catch (err) {
     console.error("Error while deleting the post :", err);
     if (err instanceof AppError) {
-      throw err;
+      return { message: err.message };
     }
 
     console.error(err);
