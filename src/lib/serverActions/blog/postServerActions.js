@@ -162,7 +162,7 @@ export async function addPost(formData) {
     }
 
     console.error(err);
-    return {message: "An error occured while creating the post"};
+    return { message: "An error occured while creating the post" };
   }
 }
 
@@ -176,18 +176,19 @@ export async function editPost(formData) {
 
     const session = await sessionInfo();
     if (!session.success) {
-      throw new Error();
+      throw new AppError("Authentication required");
     }
     const updatedData = {};
 
-    if (typeof title !== "string" || title.length < 3) throw new Error();
+    if (typeof title !== "string" || title.length < 3)
+      throw new AppError("Invalid data");
     if (title.trim() !== postToEdit.title.trim()) {
       updatedData.title = title;
       updatedData.slug = await generateUniqueSlug(title);
     }
 
     if (typeof markdownArticle !== "string" || markdownArticle.length < 3)
-      throw new Error();
+      throw new AppError("Invalid data");
     if (markdownArticle.trim() !== postToEdit.markdownArticle.trim()) {
       updatedData.markdownHTMLResult = DOMPurify.sanitize(
         marked(markdownArticle)
@@ -195,7 +196,7 @@ export async function editPost(formData) {
       updatedData.markdownArticle = markdownArticle;
     }
 
-    if (typeof coverImage !== "object") throw new Error();
+    if (typeof coverImage !== "object") throw new AppError("Invalid data");
     if (coverImage.size > 0) {
       const validImageTypes = [
         "image/jpeg",
@@ -205,14 +206,14 @@ export async function editPost(formData) {
       ];
 
       if (!validImageTypes.includes(coverImage.type)) {
-        throw new Error();
+        throw new AppError("Invalid data");
       }
 
       const imageBuffer = Buffer.from(await coverImage.arrayBuffer());
       const { width, height } = await sharp(imageBuffer).metadata();
 
       if (width > 1280 || height > 720) {
-        throw new Error();
+        throw new AppError("Invalid data");
       }
 
       //DELETE previous image
@@ -243,19 +244,19 @@ export async function editPost(formData) {
       });
 
       if (!imageToUploadResponse) {
-        throw new Error(
-          `Error while uploading the new image :  ${imageToUploadResponse.statusText}`
-        );
+        return {
+          message: `Error while uploading the new image :  ${imageToUploadResponse.statusText}`,
+        };
       }
       updatedData.coverImageUrl = imageToUploadPublicUrl;
     }
     //Tags management
 
-    if (typeof tags !== "string") throw new Error();
+    if (typeof tags !== "string") throw new AppError("Invalid data");
 
     const tagNamesArray = JSON.parse(tags);
 
-    if (!Array.isArray(tagNamesArray)) throw new Error();
+    if (!Array.isArray(tagNamesArray)) throw new AppError("Invalid data");
 
     if (!areTagsSimilar(tagNamesArray, postToEdit.tags)) {
       const tagIds = await Promise.all(
@@ -265,7 +266,8 @@ export async function editPost(formData) {
       updatedData.tags = tagIds;
     }
 
-    if (Object.keys(updatedData).length === 0) throw new Error();
+    if (Object.keys(updatedData).length === 0)
+      throw new AppError("Something went wrong : please retry later");
     const updatedPost = await Post.findByIdAndUpdate(
       postToEdit._id,
       updatedData,
@@ -278,7 +280,7 @@ export async function editPost(formData) {
   } catch (err) {
     console.error("Error while creating the post :", err);
     if (err instanceof AppError) {
-      throw err;
+      return { message: err.message };
     }
 
     console.error(err);
